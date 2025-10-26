@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>月別カテゴリ集計</title>
+</head>
+<body>
+  <h1>月別カテゴリ集計</h1>
+  <div id="tableContainer">読み込み中...</div>
+
+  <script>
+    const csvUrl = "https://github.com/TAMAGOYAKIsugar/KAKEIBO/blob/main/_SELECT_strftime_Y_m_t_date_AS_month_c_name_AS_category_SUM_t_am_202510261734.csv"; // GitHub Pages上の相対パスでもOK
+
+    fetch(csvUrl)
+      .then(res => res.text())
+      .then(text => {
+        const lines = text.trim().split('\n');
+        let html = '<table border="1"><tr>';
+        const headers = lines[0].split(',');
+        headers.forEach(h => html += `<th>${h}</th>`);
+        html += '</tr>';
+
+        for (let i = 1; i < lines.length; i++) {
+          const cells = lines[i].split(',');
+          html += '<tr>';
+          cells.forEach(c => html += `<td>${c}</td>`);
+          html += '</tr>';
+        }
+
+        html += '</table>';
+        document.getElementById('tableContainer').innerHTML = html;
+      });
+  </script>
+</body>
+</html>
