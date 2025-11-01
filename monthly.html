@@ -4,77 +4,72 @@
   <meta charset="UTF-8">
   <title>月別カテゴリ集計</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&family=Noto+Serif+JP&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hina+Mincho&family=Yusei+Magic&display=swap" rel="stylesheet">
+
   <style>
-    body {
+      body {
+      background-color: #fff;
       display: flex;
       justify-content: center;
       align-items: center;
       flex-direction: column;
       padding: 20px;
-
-      background: linear-gradient(to bottom, #fff 0%, #fdfdfd 100%);
-      background-image:
-        radial-gradient(circle at 20px 40px, #ccc 3px, transparent 3px),
-        radial-gradient(circle at 20px 80px, #ccc 3px, transparent 3px),
-        radial-gradient(circle at 20px 120px, #ccc 3px, transparent 3px),
-        radial-gradient(circle at 20px 160px, #ccc 3px, transparent 3px),
-        radial-gradient(circle at 20px 200px, #ccc 3px, transparent 3px);
-      background-repeat: repeat-y;
-      background-size: 100% 40px;
-      padding-left: 60px;
-      font-family: 'Noto Sans JP', 'Yu Gothic', sans-serif;
+      font-family: 'Yusei Magic', sans-serif;
     }
+    
     h1 {
-      font-family: 'Noto Serif JP', 'Yu Mincho', serif;
+      font-family: 'Hina Mincho', serif;
       font-size: 2em;
       margin-bottom: 10px;
+      color: #AAD6EC;
     }
+    
     table {
       border-collapse: collapse;
       margin-top: 20px;
       width: auto;
     }
+    
     th, td {
-      border: 1px solid #ccc;
+      border: 1px solid #5B5B5B;
       padding: 8px 12px;
       text-align: right;
     }
-    th:first-child, td:first-child {
+    
+    th:first-child {
       text-align: left;
+      background-color: #AAD6EC;
+      color: white;
     }
-    th {
-      background-color: #f0f0f0;
-      font-family: 'Noto Sans JP', 'Yu Gothic', sans-serif;
-      font-weight: bold;
+    
+    th:not(:first-child) {
+      background-color: #AAD6EC;
+      color: #5B5B5B;
     }
+    
     td {
-      font-family: 'Noto Sans JP', sans-serif;
+      background-color: #EEF9FF;
+      color: #5B5B5B;
+      font-family: 'Yusei Magic', sans-serif;
     }
+    
     .year-tabs {
-      position: absolute;
-      left: 0;
-      top: 120px;
       display: flex;
-      flex-direction: column;
-      gap: 10px;
-      padding-left: 10px;
-
       justify-content: center;
+      gap: 10px;
       margin-bottom: 20px;
     }
+    
     .tab {
-      background-color: #fce4ec;
+      background-color: #FC9D9D;
+      color: #5B5B5B;
       border: none;
-      border-radius: 0 10px 10px 0;
+      border-radius: 10px;
       padding: 10px 20px;
       font-weight: bold;
       cursor: pointer;
       box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
-
-      font-family: 'Noto Sans JP', 'Yu Gothic', sans-serif;
-    }
-    .tab.active {
-      background-color: #f8bbd0;
+      font-family: 'Yusei Magic', sans-serif;
     }
 
   </style>
@@ -162,5 +157,6 @@
   </script>
 </body>
 </html>
+
 
 
