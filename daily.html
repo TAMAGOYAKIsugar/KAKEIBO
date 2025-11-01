@@ -80,11 +80,8 @@
           .then(res => res.text())
           .then(text => {
             const lines = text.trim().split('\n');
-            const headers = lines[0].split(',').map(h => h.replace(/"/g, ''));
-            
-            let html = '<table><tr>';
-
-            // 🔽 ここで日本語ラベルに変換するマップを定義
+            const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim());
+        
             const headerMap = {
               id: 'ID',
               date: 'DATE',
@@ -92,48 +89,51 @@
               memo: 'MEMO',
               category_name: 'カテゴリー'
             };
-            
-            // 🔽 ヘッダーを日本語で表示
+        
+            let html = '<table><tr>';
             headers.forEach(h => {
               const label = headerMap[h] || h;
               html += `<th>${label}</th>`;
             });
-            
             html += '</tr>';
+        
+            for (let i = 1; i < lines.length; i++) {
+              if (!lines[i].trim()) continue;
+        
+              // 🔽 正規表現でCSV行を安全に分割（カンマをクォート内では無視）
+              const cells = lines[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+              if (!cells || cells.length !== headers.length) continue; // 列数が合わない行はスキップ
+        
+              html += '<tr>';
+              cells.forEach((c, index) => {
+                const clean = c.replace(/"/g, '').trim();
+                const header = headers[index] ? headers[index].toLowerCase() : '';
+                let formatted = clean;
+                let className = '';
+        
+                if (header === 'amount') {
+                  const numeric = clean.replace(/[¥￥,]/g, '');
+                  const parsed = parseInt(numeric, 10);
+                  formatted = isNaN(parsed) ? '-' : `${parsed.toLocaleString()}円`;
+                  className = 'amount';
+                } else if (header === 'id') {
+                  className = 'id';
+                }
+        
+                html += `<td${className ? ` class="${className}"` : ''}>${formatted}</td>`;
+              });
+              html += '</tr>';
+            }
+        
+            html += '</table>';
+            document.getElementById('tableContainer').innerHTML = html;
+          });
 
-      
-          for (let i = 1; i < lines.length; i++) {
-            if (!lines[i].trim()) continue; // 空行をスキップ
-            const cells = lines[i].split(',');
-            html += '<tr>';
-            
-            cells.forEach((c, index) => {
-              const clean = c.replace(/"/g, '').trim();
-              const header = headers[index] ? headers[index].toLowerCase() : '';
-              let formatted = clean;
-              let className = '';
-            
-              if (header === 'amount') {
-                const numeric = clean.replace(/[¥￥,]/g, '');
-                const parsed = parseInt(numeric, 10);
-                formatted = isNaN(parsed) ? '-' : `${parsed.toLocaleString()}円`;
-                className = 'amount';
-              } else if (header === 'id') {
-                className = 'id';
-              }
-            
-              html += `<td${className ? ` class="${className}"` : ''}>${formatted}</td>`;
-            });
-            html += '</tr>';
-          }
-      
-          html += '</table>';
-          document.getElementById('tableContainer').innerHTML = html;
-        });
 
   </script>
 </body>
 </html>
+
 
 
 
