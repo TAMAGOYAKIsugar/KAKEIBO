@@ -76,47 +76,43 @@
 
 
   <script>
-    const csvUrl = "daily.csv";
-
-    const clean = c.replace(/"/g, '').replace(/¥/g, '').trim();
-
-
-    fetch(csvUrl)
-      .then(res => res.text())
-      .then(text => {
-        const lines = text.trim().split('\n');
-        const headers = lines[0].split(',').map(h => h.replace(/"/g, ''));
-        let html = '<table><tr>';
-        headers.forEach(h => html += `<th>${h}</th>`);
-        html += '</tr>';
-
-    for (let i = 1; i < lines.length; i++) {
-        const cells = lines[i].split(',');
-        html += '<tr>';
-        cells.forEach((c, index) => {
-          const clean = c.replace(/"/g, '').replace(/¥/g, '').trim(); // ✅ ここで使う！
-          const header = headers[index].toLowerCase();
-          let formatted = clean;
-          let className = '';
+          fetch("daily.csv")
+        .then(res => res.text())
+        .then(text => {
+          const lines = text.trim().split('\n');
+          const headers = lines[0].split(',').map(h => h.replace(/"/g, ''));
+          let html = '<table><tr>';
+          headers.forEach(h => html += `<th>${h}</th>`);
+          html += '</tr>';
       
-          if (header === 'amount') {
-            formatted = `${parseInt(clean).toLocaleString()}円`;
-            className = 'amount';
-          } else if (header === 'id') {
-            className = 'id';
+          for (let i = 1; i < lines.length; i++) {
+            const cells = lines[i].split(',');
+            html += '<tr>';
+            cells.forEach((c, index) => {
+              const clean = c.replace(/"/g, '').replace(/¥/g, '').trim();
+              const header = headers[index].toLowerCase();
+              let formatted = clean;
+              let className = '';
+      
+              if (header === 'amount') {
+                formatted = `${parseInt(clean).toLocaleString()}円`;
+                className = 'amount';
+              } else if (header === 'id') {
+                className = 'id';
+              }
+      
+              html += `<td${className ? ` class="${className}"` : ''}>${formatted}</td>`;
+            });
+            html += '</tr>';
           }
       
-          html += `<td${className ? ` class="${className}"` : ''}>${formatted}</td>`;
+          html += '</table>';
+          document.getElementById('tableContainer').innerHTML = html;
         });
-        html += '</tr>';
-      }
 
-
-        html += '</table>';
-        document.getElementById('tableContainer').innerHTML = html;
-      });
   </script>
 </body>
 </html>
+
 
 
