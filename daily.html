@@ -78,6 +78,9 @@
   <script>
     const csvUrl = "daily.csv";
 
+    const clean = c.replace(/"/g, '').replace(/¥/g, '').trim();
+
+
     fetch(csvUrl)
       .then(res => res.text())
       .then(text => {
@@ -87,26 +90,27 @@
         headers.forEach(h => html += `<th>${h}</th>`);
         html += '</tr>';
 
-        for (let i = 1; i < lines.length; i++) {
-          const cells = lines[i].split(',');
-          html += '<tr>';
-          cells.forEach((c, index) => {
-            const clean = c.replace(/"/g, '').replace(/¥/g, '').trim();
-            const header = headers[index].toLowerCase();
-            let formatted = clean;
-            let className = '';
+    for (let i = 1; i < lines.length; i++) {
+        const cells = lines[i].split(',');
+        html += '<tr>';
+        cells.forEach((c, index) => {
+          const clean = c.replace(/"/g, '').replace(/¥/g, '').trim(); // ✅ ここで使う！
+          const header = headers[index].toLowerCase();
+          let formatted = clean;
+          let className = '';
+      
+          if (header === 'amount') {
+            formatted = `${parseInt(clean).toLocaleString()}円`;
+            className = 'amount';
+          } else if (header === 'id') {
+            className = 'id';
+          }
+      
+          html += `<td${className ? ` class="${className}"` : ''}>${formatted}</td>`;
+        });
+        html += '</tr>';
+      }
 
-            if (header === 'amount') {
-              formatted = `${parseInt(clean).toLocaleString()}円`;
-              className = 'amount';
-            } else if (header === 'id') {
-              className = 'id';
-            }
-
-            html += `<td${className ? ` class="${className}"` : ''}>${formatted}</td>`;
-          });
-          html += '</tr>';
-        }
 
         html += '</table>';
         document.getElementById('tableContainer').innerHTML = html;
@@ -114,4 +118,5 @@
   </script>
 </body>
 </html>
+
 
