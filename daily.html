@@ -76,18 +76,20 @@
 
 
   <script>
-          fetch("daily.csv")
-        .then(res => res.text())
-        .then(text => {
-          const lines = text.trim().split('\n');
-          const headers = lines[0].split(',').map(h => h.replace(/"/g, ''));
-          let html = '<table><tr>';
-          headers.forEach(h => html += `<th>${h}</th>`);
-          html += '</tr>';
+        fetch("daily.csv")
+          .then(res => res.text())
+          .then(text => {
+            const lines = text.trim().split('\n');
+            const headers = lines[0].split(',').map(h => h.replace(/"/g, ''));
+            let html = '<table><tr>';
+            headers.forEach(h => html += `<th>${h}</th>`);
+            html += '</tr>';
       
           for (let i = 1; i < lines.length; i++) {
+            if (!lines[i].trim()) continue; // 空行をスキップ
             const cells = lines[i].split(',');
             html += '<tr>';
+            
             cells.forEach((c, index) => {
               const clean = c.replace(/"/g, '').replace(/¥/g, '').trim();
               const header = headers[index] ? headers[index].toLowerCase() : '';
@@ -113,6 +115,7 @@
   </script>
 </body>
 </html>
+
 
 
 
