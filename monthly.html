@@ -3,29 +3,84 @@
 <head>
   <meta charset="UTF-8">
   <title>月別カテゴリ集計</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      font-family: sans-serif;
+      padding: 20px;
+    }
+    table {
+      border-collapse: collapse;
+      margin-top: 20px;
+      width: auto;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px 12px;
+      text-align: right;
+    }
+    th:first-child, td:first-child {
+      text-align: left;
+    }
+    th {
+      background-color: #f0f0f0;
+    }
+  </style>
 </head>
 <body>
   <h1>月別カテゴリ集計</h1>
   <div id="tableContainer">読み込み中...</div>
 
   <script>
-    const csvUrl = "monthly.csv"; // GitHub Pages上の相対パスでもOK
+    const csvUrl = "monthly.csv";
 
     fetch(csvUrl)
       .then(res => res.text())
       .then(text => {
         const lines = text.trim().split('\n');
-        let html = '<table border="1"><tr>';
-        const headers = lines[0].split(',');
-        headers.forEach(h => html += `<th>${h}</th>`);
+        const headers = lines[0].split(','); // ["month", "category", "total_amount"]
+        const data = [];
+
+        // データ整形
+        for (let i = 1; i < lines.length; i++) {
+          const [month, category, amountRaw] = lines[i].split(',');
+          const amount = parseInt(amountRaw.replace(/"/g, ''), 10);
+          data.push({ month, category, amount });
+        }
+
+        // 月とカテゴリの一覧を抽出
+        const months = [...new Set(data.map(d => d.month))];
+        const categories = [...new Set(data.map(d => d.category))];
+
+        // クロス表データ構築
+        const tableData = {};
+        categories.forEach(cat => {
+          tableData[cat] = {};
+          months.forEach(month => {
+            tableData[cat][month] = 0;
+          });
+        });
+
+        data.forEach(({ month, category, amount }) => {
+          tableData[category][month] += amount;
+        });
+
+        // HTML生成
+        let html = '<table><tr><th>カテゴリ</th>';
+        months.forEach(m => html += `<th>${m}</th>`);
         html += '</tr>';
 
-        for (let i = 1; i < lines.length; i++) {
-          const cells = lines[i].split(',');
-          html += '<tr>';
-          cells.forEach(c => html += `<td>${c}</td>`);
+        categories.forEach(cat => {
+          html += `<tr><td>${cat}</td>`;
+          months.forEach(month => {
+            const val = tableData[cat][month];
+            html += `<td>${val ? val.toLocaleString() + '円' : '-'}</td>`;
+          });
           html += '</tr>';
-        }
+        });
 
         html += '</table>';
         document.getElementById('tableContainer').innerHTML = html;
@@ -33,5 +88,3 @@
   </script>
 </body>
 </html>
-
-
