@@ -3,27 +3,89 @@
 <head>
   <meta charset="UTF-8">
   <title>日別の詳細な収支記録</title>
+  <link href="https://fonts.googleapis.com/css2?family=Hina+Mincho&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: #fff;
+      font-family: 'Hina Mincho', serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #8CD790;
+      font-size: 2em;
+      margin-bottom: 20px;
+    }
+
+    #tableContainer {
+      overflow-x: auto;
+      width: 100%;
+      max-width: 1000px;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      font-family: 'Hina Mincho', serif;
+    }
+
+    th, td {
+      border: 1px solid #5B5B5B;
+      padding: 8px 12px;
+      font-weight: bold;
+    }
+
+    th {
+      background-color: #77AF9C;
+      color: white;
+      text-align: center;
+    }
+
+    td {
+      background-color: #C5E99B;
+      color: #757575;
+      text-align: center;
+    }
+
+    td.amount {
+      text-align: right;
+    }
+
+    td:first-child {
+      background-color: #77AF9C;
+      color: white;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
   <h1>日別の詳細な収支記録</h1>
   <div id="tableContainer">読み込み中...</div>
 
   <script>
-    const csvUrl = "daily.csv"; // GitHub Pages上の相対パスでもOK
+    const csvUrl = "daily.csv";
 
     fetch(csvUrl)
       .then(res => res.text())
       .then(text => {
         const lines = text.trim().split('\n');
-        let html = '<table border="1"><tr>';
-        const headers = lines[0].split(',');
+        const headers = lines[0].split(',').map(h => h.replace(/"/g, ''));
+        let html = '<table><tr>';
         headers.forEach(h => html += `<th>${h}</th>`);
         html += '</tr>';
 
         for (let i = 1; i < lines.length; i++) {
           const cells = lines[i].split(',');
           html += '<tr>';
-          cells.forEach(c => html += `<td>${c}</td>`);
+          cells.forEach((c, index) => {
+            const clean = c.replace(/"/g, '');
+            const isAmount = headers[index].toLowerCase().includes('amount');
+            const formatted = isAmount ? `${parseInt(clean).toLocaleString()}円` : clean;
+            html += `<td${isAmount ? ' class="amount"' : ''}>${formatted}</td>`;
+          });
           html += '</tr>';
         }
 
@@ -33,5 +95,3 @@
   </script>
 </body>
 </html>
-
-
