@@ -6,7 +6,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&family=Noto+Serif+JP&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Hina+Mincho&family=Yusei+Magic&display=swap" rel="stylesheet">
 
-       <style>
+   <style>
       body {
         background-color: #fff;
         display: flex;
@@ -34,25 +34,26 @@
       th, td {
         border: 1px solid #5B5B5B;
         padding: 8px 12px;
-        text-align: right;
         font-family: 'Hina Mincho', serif;
       }
     
       th {
         background-color: #AAD6EC;
         color: white;
+        text-align: center; /* ✅ 中央揃えに変更 */
       }
     
       td {
         background-color: #EEF9FF;
         color: #5B5B5B;
         font-weight: bold;
+        text-align: right; /* ✅ 数字は右揃えのまま */
       }
     
       td:first-child {
         background-color: #AAD6EC;
         color: white;
-        text-align: left;
+        text-align: center; /* ✅ カテゴリ列も中央揃えに変更 */
         font-family: 'Hina Mincho', serif;
       }
     
@@ -74,7 +75,8 @@
         box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
         font-family: 'Hina Mincho', serif;
       }
-    </style>
+</style>
+
 
 
 </head>
@@ -170,6 +172,7 @@
   </script>
 </body>
 </html>
+
 
 
 
