@@ -81,9 +81,26 @@
           .then(text => {
             const lines = text.trim().split('\n');
             const headers = lines[0].split(',').map(h => h.replace(/"/g, ''));
+            
             let html = '<table><tr>';
-            headers.forEach(h => html += `<th>${h}</th>`);
+
+            // 🔽 ここで日本語ラベルに変換するマップを定義
+            const headerMap = {
+              id: 'ID',
+              date: 'DATE',
+              amount: '金額',
+              memo: 'MEMO',
+              category_name: 'カテゴリー'
+            };
+            
+            // 🔽 ヘッダーを日本語で表示
+            headers.forEach(h => {
+              const label = headerMap[h] || h;
+              html += `<th>${label}</th>`;
+            });
+            
             html += '</tr>';
+
       
           for (let i = 1; i < lines.length; i++) {
             if (!lines[i].trim()) continue; // 空行をスキップ
@@ -91,18 +108,20 @@
             html += '<tr>';
             
             cells.forEach((c, index) => {
-              const clean = c.replace(/"/g, '').replace(/¥/g, '').trim();
+              const clean = c.replace(/"/g, '').trim();
               const header = headers[index] ? headers[index].toLowerCase() : '';
               let formatted = clean;
               let className = '';
-      
+            
               if (header === 'amount') {
-                formatted = `${parseInt(clean).toLocaleString()}円`;
+                const numeric = clean.replace(/[¥￥,]/g, '');
+                const parsed = parseInt(numeric, 10);
+                formatted = isNaN(parsed) ? '-' : `${parsed.toLocaleString()}円`;
                 className = 'amount';
               } else if (header === 'id') {
                 className = 'id';
               }
-      
+            
               html += `<td${className ? ` class="${className}"` : ''}>${formatted}</td>`;
             });
             html += '</tr>';
@@ -115,6 +134,7 @@
   </script>
 </body>
 </html>
+
 
 
 
