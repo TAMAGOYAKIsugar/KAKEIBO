@@ -63,6 +63,15 @@
 </head>
 <body>
   <h1>日別の詳細な収支記録</h1>
+
+   <div style="margin-bottom: 20px; font-family: 'Hina Mincho', serif;">
+      <label for="categoryFilter">カテゴリーで絞り込む：</label>
+      <select id="categoryFilter">
+        <option value="">すべて表示</option>
+      </select>
+    </div>
+
+  
   <div id="tableContainer">読み込み中...</div>
 
   <footer style="margin-top: 40px; text-align: center; font-family: 'Hina Mincho', serif;">
@@ -76,63 +85,101 @@
 
 
   <script>
-        fetch("daily.csv")
-          .then(res => res.text())
-          .then(text => {
-            const lines = text.trim().split('\n');
-            const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim());
-        
-            const headerMap = {
-              id: 'ID',
-              date: 'DATE',
-              amount: '金額',
-              memo: 'MEMO',
-              category_name: 'カテゴリー'
-            };
-        
-            let html = '<table><tr>';
-            headers.forEach(h => {
-              const label = headerMap[h] || h;
-              html += `<th>${label}</th>`;
-            });
-            html += '</tr>';
-        
-            for (let i = 1; i < lines.length; i++) {
-              if (!lines[i].trim()) continue;
-        
-              // 🔽 正規表現でCSV行を安全に分割（カンマをクォート内では無視）
-              const cells = lines[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
-              if (!cells || cells.length !== headers.length) continue; // 列数が合わない行はスキップ
-        
-              html += '<tr>';
-              cells.forEach((c, index) => {
-                const clean = c.replace(/"/g, '').trim();
-                const header = headers[index] ? headers[index].toLowerCase() : '';
-                let formatted = clean;
-                let className = '';
-        
-                if (header === 'amount') {
-                  const numeric = clean.replace(/[¥￥,]/g, '');
-                  const parsed = parseInt(numeric, 10);
-                  formatted = isNaN(parsed) ? '-' : `${parsed.toLocaleString()}円`;
-                  className = 'amount';
-                } else if (header === 'id') {
-                  className = 'id';
-                }
-        
-                html += `<td${className ? ` class="${className}"` : ''}>${formatted}</td>`;
-              });
-              html += '</tr>';
-            }
-        
-            html += '</table>';
-            document.getElementById('tableContainer').innerHTML = html;
-          });
-
-
+    let originalRows = [];
+    let headers = [];
+  
+    const headerMap = {
+      id: 'ID',
+      date: 'DATE',
+      amount: '金額',
+      memo: 'MEMO',
+      category_name: 'カテゴリー'
+    };
+  
+    function renderTable(filteredRows) {
+      let html = '<table><tr>';
+      headers.forEach(h => {
+        const label = headerMap[h] || h;
+        html += `<th>${label}</th>`;
+      });
+      html += '</tr>';
+  
+      filteredRows.forEach(cells => {
+        html += '<tr>';
+        cells.forEach((c, index) => {
+          const clean = c.replace(/"/g, '').trim();
+          const header = headers[index] ? headers[index].toLowerCase() : '';
+          let formatted = clean;
+          let className = '';
+  
+          if (header === 'amount') {
+            const numeric = clean.replace(/[¥￥,]/g, '');
+            const parsed = parseInt(numeric, 10);
+            formatted = isNaN(parsed) ? '-' : `${parsed.toLocaleString()}円`;
+            className = 'amount';
+          } else if (header === 'id') {
+            className = 'id';
+          }
+  
+          html += `<td${className ? ` class="${className}"` : ''}>${formatted}</td>`;
+        });
+        html += '</tr>';
+      });
+  
+      html += '</table>';
+      document.getElementById('tableContainer').innerHTML = html;
+    }
+  
+    fetch("daily.csv")
+      .then(res => res.text())
+      .then(text => {
+        const lines = text.trim().split('\n');
+        headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim());
+  
+        const categorySet = new Set();
+  
+        for (let i = 1; i < lines.length; i++) {
+          if (!lines[i].trim()) continue;
+          const cells = lines[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+          if (!cells || cells.length !== headers.length) continue;
+  
+          originalRows.push(cells);
+  
+          const categoryIndex = headers.indexOf('category_name');
+          if (categoryIndex !== -1) {
+            const raw = cells[categoryIndex].replace(/"/g, '').trim();
+            if (raw) categorySet.add(raw);
+          }
+        }
+  
+        // 🔽 セレクトボックスにカテゴリを追加
+        const select = document.getElementById('categoryFilter');
+        categorySet.forEach(cat => {
+          const option = document.createElement('option');
+          option.value = cat;
+          option.textContent = cat;
+          select.appendChild(option);
+        });
+  
+        renderTable(originalRows);
+      });
+  
+    // 🔽 セレクトボックスのイベント
+    document.addEventListener('DOMContentLoaded', () => {
+      const select = document.getElementById('categoryFilter');
+      select.addEventListener('change', function () {
+        const selected = this.value;
+        const filtered = selected
+          ? originalRows.filter(row => row[headers.indexOf('category_name')].includes(selected))
+          : originalRows;
+        renderTable(filtered);
+      });
+    });
   </script>
+
 </body>
 </html>
+
 
 
 
