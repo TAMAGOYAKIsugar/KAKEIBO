@@ -28,63 +28,111 @@
     th {
       background-color: #f0f0f0;
     }
+    .year-tabs {
+  position: absolute;
+  left: 0;
+  top: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-left: 10px;
+    }
+    .tab {
+      background-color: #fce4ec;
+      border: none;
+      border-radius: 0 10px 10px 0;
+      padding: 10px 20px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+    }
+    .tab.active {
+      background-color: #f8bbd0;
+    }
+
   </style>
 </head>
 <body>
   <h1>月別カテゴリ集計</h1>
+  <div class="year-tabs" id="yearTabs"></div>
+
   <div id="tableContainer">読み込み中...</div>
 
   <script>
     const csvUrl = "monthly.csv";
-
+    let allData = [];
+    
     fetch(csvUrl)
       .then(res => res.text())
       .then(text => {
         const lines = text.trim().split('\n');
-        const headers = lines[0].split(','); // ["month", "category", "total_amount"]
-        const data = [];
-
-        // データ整形
+        const headers = lines[0].split(',').map(h => h.replace(/"/g, ''));
         for (let i = 1; i < lines.length; i++) {
-          const [month, category, amountRaw] = lines[i].split(',');
+          const [monthRaw, category, amountRaw] = lines[i].split(',');
+          const month = monthRaw.replace(/"/g, '');
+          const year = month.split('-')[0];
           const amount = parseInt(amountRaw.replace(/"/g, ''), 10);
-          data.push({ month, category, amount });
+          allData.push({ year, month, category, amount });
         }
-
-        // 月とカテゴリの一覧を抽出
-        const months = [...new Set(data.map(d => d.month))];
-        const categories = [...new Set(data.map(d => d.category))];
-
-        // クロス表データ構築
-        const tableData = {};
-        categories.forEach(cat => {
-          tableData[cat] = {};
-          months.forEach(month => {
-            tableData[cat][month] = 0;
-          });
+    
+        const years = [...new Set(allData.map(d => d.year))].sort();
+        const latestYear = years[years.length - 1];
+    
+        // 年ボタン生成
+        const tabContainer = document.getElementById('yearTabs');
+        years.forEach(y => {
+          const btn = document.createElement('button');
+          btn.textContent = `${y}年`;
+          btn.className = 'tab';
+          btn.dataset.year = y;
+          btn.onclick = () => {
+            document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderTable(y);
+          };
+          tabContainer.appendChild(btn);
         });
-
-        data.forEach(({ month, category, amount }) => {
-          tableData[category][month] += amount;
-        });
-
-        // HTML生成
-        let html = '<table><tr><th>カテゴリ</th>';
-        months.forEach(m => html += `<th>${m}</th>`);
-        html += '</tr>';
-
-        categories.forEach(cat => {
-          html += `<tr><td>${cat}</td>`;
-          months.forEach(month => {
-            const val = tableData[cat][month];
-            html += `<td>${val ? val.toLocaleString() + '円' : '-'}</td>`;
-          });
-          html += '</tr>';
-        });
-
-        html += '</table>';
-        document.getElementById('tableContainer').innerHTML = html;
+    
+        // 最新年を表示
+        document.querySelector(`.tab[data-year="${latestYear}"]`).classList.add('active');
+        renderTable(latestYear);
       });
+    
+    function renderTable(year) {
+      const filtered = allData.filter(d => d.year === year);
+      const months = [...new Set(filtered.map(d => d.month))];
+      const categories = [...new Set(filtered.map(d => d.category))];
+    
+      const tableData = {};
+      categories.forEach(cat => {
+        tableData[cat] = {};
+        months.forEach(month => {
+          tableData[cat][month] = 0;
+        });
+      });
+    
+      filtered.forEach(({ month, category, amount }) => {
+        tableData[category][month] += amount;
+      });
+    
+      let html = '<table><tr><th>カテゴリ</th>';
+      months.forEach(m => html += `<th>${m}</th>`);
+      html += '</tr>';
+    
+      categories.forEach(cat => {
+        html += `<tr><td>${cat}</td>`;
+        months.forEach(month => {
+          const val = tableData[cat][month];
+          html += `<td>${val ? val.toLocaleString() + '円' : '-'}</td>`;
+        });
+        html += '</tr>';
+      });
+    
+      html += '</table>';
+      document.getElementById('tableContainer').innerHTML = html;
+    }
+
   </script>
 </body>
 </html>
+
