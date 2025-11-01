@@ -3,14 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <title>月別カテゴリ集計</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&family=Noto+Serif+JP&display=swap" rel="stylesheet">
   <style>
     body {
       display: flex;
       justify-content: center;
       align-items: center;
       flex-direction: column;
-      font-family: sans-serif;
       padding: 20px;
+
+      background: linear-gradient(to bottom, #fff 0%, #fdfdfd 100%);
+      background-image:
+        radial-gradient(circle at 20px 40px, #ccc 3px, transparent 3px),
+        radial-gradient(circle at 20px 80px, #ccc 3px, transparent 3px),
+        radial-gradient(circle at 20px 120px, #ccc 3px, transparent 3px),
+        radial-gradient(circle at 20px 160px, #ccc 3px, transparent 3px),
+        radial-gradient(circle at 20px 200px, #ccc 3px, transparent 3px);
+      background-repeat: repeat-y;
+      background-size: 100% 40px;
+      padding-left: 60px;
+      font-family: 'Noto Sans JP', 'Yu Gothic', sans-serif;
+    }
+    h1 {
+      font-family: 'Noto Serif JP', 'Yu Mincho', serif;
+      font-size: 2em;
+      margin-bottom: 10px;
     }
     table {
       border-collapse: collapse;
@@ -27,15 +44,23 @@
     }
     th {
       background-color: #f0f0f0;
+      font-family: 'Noto Sans JP', 'Yu Gothic', sans-serif;
+      font-weight: bold;
+    }
+    td {
+      font-family: 'Noto Sans JP', sans-serif;
     }
     .year-tabs {
-  position: absolute;
-  left: 0;
-  top: 120px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding-left: 10px;
+      position: absolute;
+      left: 0;
+      top: 120px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding-left: 10px;
+
+      justify-content: center;
+      margin-bottom: 20px;
     }
     .tab {
       background-color: #fce4ec;
@@ -45,6 +70,8 @@
       font-weight: bold;
       cursor: pointer;
       box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+
+      font-family: 'Noto Sans JP', 'Yu Gothic', sans-serif;
     }
     .tab.active {
       background-color: #f8bbd0;
@@ -135,4 +162,5 @@
   </script>
 </body>
 </html>
+
 
