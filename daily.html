@@ -54,7 +54,7 @@
       text-align: right;
     }
 
-    td:first-child {
+    td.id {
       background-color: #77AF9C;
       color: white;
       text-align: center;
@@ -81,10 +81,19 @@
           const cells = lines[i].split(',');
           html += '<tr>';
           cells.forEach((c, index) => {
-            const clean = c.replace(/"/g, '');
-            const isAmount = headers[index].toLowerCase().includes('amount');
-            const formatted = isAmount ? `${parseInt(clean).toLocaleString()}円` : clean;
-            html += `<td${isAmount ? ' class="amount"' : ''}>${formatted}</td>`;
+            const clean = c.replace(/"/g, '').replace(/¥/g, '').trim();
+            const header = headers[index].toLowerCase();
+            let formatted = clean;
+            let className = '';
+
+            if (header === 'amount') {
+              formatted = `${parseInt(clean).toLocaleString()}円`;
+              className = 'amount';
+            } else if (header === 'id') {
+              className = 'id';
+            }
+
+            html += `<td${className ? ` class="${className}"` : ''}>${formatted}</td>`;
           });
           html += '</tr>';
         }
