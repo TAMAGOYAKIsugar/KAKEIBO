@@ -108,17 +108,13 @@
         html += '<tr>';
         cells.forEach((c, index) => {
           const clean = c.replace(/"/g, '').trim();
-          const header = headers[index] ? headers[index].toLowerCase() : '';
+          const header = headers[index].toLowerCase();
           let formatted = clean;
           let className = '';
   
           if (header === 'amount') {
-            const numeric = clean.replace(/[¥￥,]/g, '');
-            const parsed = parseInt(numeric, 10);
+            const parsed = Number(clean);
             formatted = isNaN(parsed) ? '-' : `${parsed.toLocaleString()}円`;
-            className = 'amount';
-          } else if (header === 'id') {
-            className = 'id';
           }
   
           html += `<td${className ? ` class="${className}"` : ''}>${formatted}</td>`;
@@ -152,6 +148,10 @@
           }
         }
   
+        // 🔽 日付で降順ソート（新しい順）
+        const dateIndex = headers.indexOf('date');
+        originalRows.sort((a, b) => new Date(b[dateIndex]) - new Date(a[dateIndex]));
+  
         // 🔽 セレクトボックスにカテゴリを追加
         const select = document.getElementById('categoryFilter');
         categorySet.forEach(cat => {
@@ -169,16 +169,19 @@
       const select = document.getElementById('categoryFilter');
       select.addEventListener('change', function () {
         const selected = this.value;
+        const categoryIndex = headers.indexOf('category_name');
         const filtered = selected
-          ? originalRows.filter(row => row[headers.indexOf('category_name')].includes(selected))
+          ? originalRows.filter(row => row[categoryIndex].includes(selected))
           : originalRows;
         renderTable(filtered);
       });
     });
   </script>
+  
 
 </body>
 </html>
+
 
 
 
