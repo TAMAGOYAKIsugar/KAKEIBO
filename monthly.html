@@ -98,24 +98,23 @@
   <script>
     const csvUrl = "monthly.csv";
     let allData = [];
-    
+  
     fetch(csvUrl)
       .then(res => res.text())
       .then(text => {
         const lines = text.trim().split('\n');
-        const headers = lines[0].split(',').map(h => h.replace(/"/g, ''));
         for (let i = 1; i < lines.length; i++) {
-          const [monthRaw, category, amountRaw] = lines[i].split(',');
-          const month = monthRaw.replace(/"/g, '');
+          const [monthRaw, categoryRaw, amountRaw] = lines[i].split(',');
+          const month = monthRaw;
           const year = month.split('-')[0];
-          const amount = parseInt(amountRaw.replace(/"/g, ''), 10);
+          const category = categoryRaw.replace(/"/g, '');
+          const amount = Number(amountRaw);
           allData.push({ year, month, category, amount });
         }
-    
+  
         const years = [...new Set(allData.map(d => d.year))].sort();
         const latestYear = years[years.length - 1];
-    
-        // 年ボタン生成
+  
         const tabContainer = document.getElementById('yearTabs');
         years.forEach(y => {
           const btn = document.createElement('button');
@@ -129,17 +128,16 @@
           };
           tabContainer.appendChild(btn);
         });
-    
-        // 最新年を表示
+  
         document.querySelector(`.tab[data-year="${latestYear}"]`).classList.add('active');
         renderTable(latestYear);
       });
-    
+  
     function renderTable(year) {
       const filtered = allData.filter(d => d.year === year);
       const months = [...new Set(filtered.map(d => d.month))];
       const categories = [...new Set(filtered.map(d => d.category))];
-    
+  
       const tableData = {};
       categories.forEach(cat => {
         tableData[cat] = {};
@@ -147,15 +145,15 @@
           tableData[cat][month] = 0;
         });
       });
-    
+  
       filtered.forEach(({ month, category, amount }) => {
         tableData[category][month] += amount;
       });
-    
+  
       let html = '<table><tr><th>カテゴリ</th>';
       months.forEach(m => html += `<th>${m}</th>`);
       html += '</tr>';
-    
+  
       categories.forEach(cat => {
         html += `<tr><td>${cat}</td>`;
         months.forEach(month => {
@@ -164,14 +162,15 @@
         });
         html += '</tr>';
       });
-    
+  
       html += '</table>';
       document.getElementById('tableContainer').innerHTML = html;
     }
-
   </script>
+
 </body>
 </html>
+
 
 
 
